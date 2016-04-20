@@ -1,0 +1,27 @@
+<component name="libraryTable">
+  <library name="GOPATH &lt;utilsible&gt;">
+    <CLASSES>
+      <root url="file://$PROJECT_DIR$/../../../thriftTutorial" />
+      <root url="file://$PROJECT_DIR$/../../../git.apache.org" />
+      <root url="file://$PROJECT_DIR$/../../../gopkg.in" />
+      <root url="file://$PROJECT_DIR$/../../../google.golang.org" />
+      <root url="file://$PROJECT_DIR$/../.." />
+      <root url="file://$PROJECT_DIR$/../../../golang.org" />
+      <root url="file://$PROJECT_DIR$/../../../9fans.net" />
+      <root url="file://$PROJECT_DIR$/../../../mapreduce" />
+      <root url="file://$PROJECT_DIR$/../../../lockservice" />
+      <root url="file://$PROJECT_DIR$/../../../paxos" />
+      <root url="file://$PROJECT_DIR$/../../../pbservice" />
+      <root url="file://$PROJECT_DIR$/../../../main" />
+      <root url="file://$PROJECT_DIR$/../../../shardkv" />
+      <root url="file://$PROJECT_DIR$/../../../shardmaster" />
+      <root url="file://$PROJECT_DIR$/../../../viewservice" />
+      <root url="file://$PROJECT_DIR$/../../../kvpaxos" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+    <excluded>
+      <root url="file://$PROJECT_DIR$" />
+    </excluded>
+  </library>
+</component>
