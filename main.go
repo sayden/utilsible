@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"github.com/codegangsta/cli"
+	"html/template"
 )
 
 var rolesFolders = [7]string{"tasks", "templates", "vars", "files", "meta", "handlers", "defaults"}
@@ -125,15 +126,28 @@ func addNewRole(args []string) {
 	}
 }
 
+type Role struct {
+	Role      string
+	Subfolder string
+}
+
 func createMainFileWithComments(r string, subfolder string) {
 	f, err := os.Create("main.yml")
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	fileContent := fmt.Sprintf("# roles/%s/%s/main.yml\n", r, subfolder)
+	//TODO Check current folder to know how many times it must chdir up
+	tmpl, err := template.ParseFiles("../../../templates/rolesMain.yml")
+	if err != nil {
+		log.Fatal(err)
+	}
 
-	_, err = f.WriteString(fileContent)
+	tmplRole := Role{
+		Role:r,
+		Subfolder:subfolder,
+	}
+	err = tmpl.Execute(f, tmplRole)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -145,8 +159,15 @@ func createReadmeFile(r string) {
 		log.Fatal(err)
 	}
 
-	_, err = f.WriteString(fmt.Sprintf("# Role: %s\n", r))
+	role := Role{
+		Role:r,
+	}
+
+	//TODO Check current folder to know how many times it must chdir up
+	tmpl, err := template.ParseFiles("../../templates/README.md")
 	if err != nil {
 		log.Fatal(err)
 	}
+
+	err = tmpl.Execute(f, role)
 }
