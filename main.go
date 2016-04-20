@@ -24,7 +24,7 @@ func main() {
 				{
 					Name:   "add",
 					Usage:  "add a new role",
-					Action: addNewRole,
+					Action: getAddNewRoleFunc,
 				},
 				{
 					Name:   "clean",
@@ -51,13 +51,19 @@ func lintRole(c *cli.Context) {
 	println("Linting role")
 }
 
-func addNewRole(c *cli.Context) {
-	if len(c.Args()) == 0 {
+func getAddNewRoleFunc(c *cli.Context) {
+	addNewRole(c.Args())
+}
+
+//addNewRole adds a new folder with the role passed as argument. It creates
+//roles folder as neccesary if it doesn't exists yet
+func addNewRole(args []string) {
+	if len(args) == 0 {
 		println("No name of new role passed")
 		return
 	}
 
-	roleName := c.Args()[0]
+	roleName := args[0]
 	fmt.Printf("Adding new role %s\n", roleName)
 
 	//Permissions for the new files and folders
@@ -90,11 +96,57 @@ func addNewRole(c *cli.Context) {
 		log.Fatal(err)
 	}
 
+	createReadmeFile(roleName)
+
 	//Create all roles subfolders
 	for _, role := range rolesFolders {
 		err := os.Mkdir(role, dirMode)
 		if err != nil {
 			log.Fatal(err)
 		}
+
+		//Change to the new folder
+		cur, err := os.Getwd()
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		err = os.Chdir(role)
+		if err != nil {
+			log.Fatal(err)
+		}
+		createMainFileWithComments(roleName, role)
+
+		//Come to the previous folder
+		err = os.Chdir(cur)
+		if err != nil {
+			log.Fatal(err)
+		}
+	}
+}
+
+func createMainFileWithComments(r string, subfolder string) {
+	f, err := os.Create("main.yml")
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	fileContent := fmt.Sprintf("# roles/%s/%s/main.yml\n", r, subfolder)
+
+	_, err = f.WriteString(fileContent)
+	if err != nil {
+		log.Fatal(err)
+	}
+}
+
+func createReadmeFile(r string) {
+	f, err := os.Create("README.md")
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	_, err = f.WriteString(fmt.Sprintf("# Role: %s\n", r))
+	if err != nil {
+		log.Fatal(err)
 	}
 }
