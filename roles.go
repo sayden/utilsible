@@ -14,16 +14,19 @@ func createReadmeFile(r string) {
 		log.Fatal(err)
 	}
 
-	role := Role{
-		Role: r,
-	}
-
 	tmpl, err := template.ParseFiles("../../templates/README.md")
 	if err != nil {
 		log.Fatal(err)
 	}
 
+	role := Role{
+		Role: r,
+	}
+
 	err = tmpl.Execute(f, role)
+	if err != nil {
+		log.Fatal(err)
+	}
 }
 
 // Role is a struct to hold the information about a role that is being
@@ -49,6 +52,7 @@ func createMainFileWithComments(r string, subfolder string) {
 		Role:      r,
 		Subfolder: subfolder,
 	}
+
 	err = tmpl.Execute(f, tmplRole)
 	if err != nil {
 		log.Fatal(err)
