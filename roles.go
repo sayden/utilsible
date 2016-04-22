@@ -7,23 +7,23 @@ import (
 	"text/template"
 )
 
-//createReadmeFile creates a Readme file for the root folder of every role
-func createReadmeFile(r string) {
-	f, err := os.Create("README.md")
+func createTextFile(role string, t string, subfolder string){
+	f, err := os.Create(t)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	tmpl, err := template.ParseFiles("../../templates/README.md")
+	tmpl, err := template.ParseFiles(os.Getenv("UTILSIBLE") + "/templates/roles/" + t)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	role := Role{
-		Role: r,
+	_role := Role{
+		Role: role,
+		Subfolder:subfolder,
 	}
 
-	err = tmpl.Execute(f, role)
+	err = tmpl.Execute(f, _role)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -34,29 +34,6 @@ func createReadmeFile(r string) {
 type Role struct {
 	Role      string
 	Subfolder string
-}
-
-// createMainFileWithComments creates a main.yml file within specified subfolder
-func createMainFileWithComments(r string, subfolder string) {
-	f, err := os.Create("main.yml")
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	tmpl, err := template.ParseFiles("../../../templates/rolesMain.yml")
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	tmplRole := Role{
-		Role:      r,
-		Subfolder: subfolder,
-	}
-
-	err = tmpl.Execute(f, tmplRole)
-	if err != nil {
-		log.Fatal(err)
-	}
 }
 
 //addNewRole adds a new folder with the role passed as argument. It creates
@@ -94,11 +71,11 @@ func addNewRole(args []string) {
 		log.Fatal(err)
 	}
 
-	createReadmeFile(roleName)
+	createTextFile(roleName, "README.md", "")
 
 	//Create all roles subfolders
-	for _, role := range rolesFolders {
-		err := os.Mkdir(role, dirMode)
+	for _, subfolder := range rolesFolders {
+		err := os.Mkdir(subfolder, dirMode)
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -109,11 +86,12 @@ func addNewRole(args []string) {
 			log.Fatal(err)
 		}
 
-		err = os.Chdir(role)
+		err = os.Chdir(subfolder)
 		if err != nil {
 			log.Fatal(err)
 		}
-		createMainFileWithComments(roleName, role)
+
+		createTextFile(roleName, "main.yml", subfolder)
 
 		//Come to the previous folder
 		err = os.Chdir(cur)
