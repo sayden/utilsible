@@ -5,22 +5,24 @@ import (
 	"log"
 	"os"
 	"text/template"
+
+	"github.com/codegangsta/cli"
 )
 
-func createTextFile(role string, t string, subfolder string){
+func createTextFile(role string, t string, subfolder string, templatesFolder string) {
 	f, err := os.Create(t)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	tmpl, err := template.ParseFiles(os.Getenv("UTILSIBLE") + "/templates/roles/" + t)
+	tmpl, err := template.ParseFiles(templatesFolder + "/templates/roles/" + t)
 	if err != nil {
 		log.Fatal(err)
 	}
 
 	_role := Role{
-		Role: role,
-		Subfolder:subfolder,
+		Role:      role,
+		Subfolder: subfolder,
 	}
 
 	err = tmpl.Execute(f, _role)
@@ -38,13 +40,25 @@ type Role struct {
 
 //addNewRole adds a new folder with the role passed as argument. It creates
 //roles folder as neccesary if it doesn't exists yet
-func addNewRole(args []string) {
-	if len(args) == 0 {
+func addNewRole(c *cli.Context) {
+	if len(c.Args()) == 0 {
 		println("No name of new role passed")
 		return
 	}
 
-	roleName := args[0]
+	_, readmeExistsErr := os.Stat(c.GlobalString("template") + "/templates/roles/README.md")
+	_, mainExistsErr := os.Stat(c.GlobalString("template") + "/templates/roles/main.yml")
+	if os.IsNotExist(readmeExistsErr) {
+		log.Fatalf("README.md file in path %s doesn't exists", c.GlobalString("template") + "/templates/roles/README.md")
+	}
+
+	if os.IsNotExist(mainExistsErr) {
+		log.Fatalf("main.yml file in path %s doesn't exists", c.GlobalString("template") + "/templates/roles/main.yml")
+	}
+
+
+
+	roleName := c.Args()[0]
 	fmt.Printf("Adding new role %s\n", roleName)
 
 	//Permissions for the new files and folders
@@ -71,7 +85,7 @@ func addNewRole(args []string) {
 		log.Fatal(err)
 	}
 
-	createTextFile(roleName, "README.md", "")
+	createTextFile(roleName, "README.md", "", c.GlobalString("template"))
 
 	//Create all roles subfolders
 	for _, subfolder := range rolesFolders {
@@ -91,7 +105,7 @@ func addNewRole(args []string) {
 			log.Fatal(err)
 		}
 
-		createTextFile(roleName, "main.yml", subfolder)
+		createTextFile(roleName, "main.yml", subfolder, c.GlobalString("template")	)
 
 		//Come to the previous folder
 		err = os.Chdir(cur)

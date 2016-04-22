@@ -14,6 +14,7 @@ func main() {
 	app := cli.NewApp()
 	app.Name = "utilsible"
 	app.Usage = "Command line utilities for Ansible"
+
 	app.Commands = []cli.Command{
 		{
 			Name:    "roles",
@@ -23,7 +24,7 @@ func main() {
 				{
 					Name:   "add",
 					Usage:  "add a new role",
-					Action: getAddNewRoleFunc,
+					Action: addNewRole,
 				},
 				{
 					Name:   "clean",
@@ -39,6 +40,15 @@ func main() {
 		},
 	}
 
+	app.Flags = []cli.Flag {
+		cli.StringFlag{
+			Name: "template, t",
+			Value: "/etc/utilsible",
+			Usage : "Specify folder of templates folder",
+			EnvVar: "UTILSIBLE",
+		},
+	}
+
 	app.Run(os.Args)
 }
 
@@ -48,10 +58,6 @@ func cleanRole(c *cli.Context) {
 
 func lintRole(c *cli.Context) {
 	println("Linting role")
-}
-
-func getAddNewRoleFunc(c *cli.Context) {
-	addNewRole(c.Args())
 }
 
 // isRoot checks if we are in root Ansible folder or already in roles
